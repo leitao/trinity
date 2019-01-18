@@ -518,7 +518,17 @@ void child_process(struct childdata *child, int childno)
 		/* timestamp, and do the childop */
 		clock_gettime(CLOCK_MONOTONIC, &child->tp);
 
+		if (rand()%2 == 0)
+			asm goto ( "tbegin.		\n"
+				   "beq	%l[after]\n"
+				   : : : : after); 
+
+		if (rand()%2 == 0)
+			asm ("tsuspend.	\n");
+
 		ret = op(child);
+after:
+		asm("tend.	\n");
 
 		child->op_nr++;
 
